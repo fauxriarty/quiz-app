@@ -1,26 +1,26 @@
-game = new Game();
-game.startGame();
+let game = new Game();
 
-const overlay = document.getElementById('overlay')
+document.addEventListener("DOMContentLoaded", function() {
+    game.startGame();
+});
+
+const overlay = document.getElementById('overlay');
 overlay.style.display = 'none';
-const answers = document.querySelector('.answers')
 
-let timerValue = 120;  //in seconds
+let timerValue = 120;
 let timerInterval;
-const timerDisplay = document.createElement('p');  
-document.body.appendChild(timerDisplay);  
+const timerDisplay = document.createElement('p');
+document.body.appendChild(timerDisplay);
 
 function startTimer() {
-    clearInterval(timerInterval);  // Clear any previous interval
-
+    clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timerValue--;
         updateTimerDisplay();
-
         if (timerValue <= 0) {
             endGameDueToTimeOut();
         }
-    }, 1000);  // Decrease timerValue every second
+    }, 1000);
 }
 
 function pauseTimer() {
@@ -40,38 +40,26 @@ function updateTimerDisplay() {
 
 function endGameDueToTimeOut() {
     clearInterval(timerInterval);
-    alert("Time's up!"); 
-    game.endQuiz(correctAnswers, data.length);
+    alert("Time's up!");
+    game.endQuiz();
 }
 
-
-answers.addEventListener('click', (e)=>{
-    pauseTimer();  
-    if(answers.className !== 'answers active' && e.target.classList.contains('answer')){
-        game.handleInteraction(e)
-        answers.className = "answers active";
-        updateScore();
+const answers = document.querySelector('.answers');
+answers.addEventListener('click', (e) => {
+    pauseTimer();
+    if (!answers.classList.contains('active') && e.target.classList.contains('answer')) {
+        game.handleInteraction(e);
+        answers.classList.add('active');
     }
-    else{
-        answers.setAttribute('disabled', true); 
-    }
-})
+});
 
-const next_button = document.querySelector('.next')
-next_button.addEventListener('click', ()=>{
+const next_button = document.querySelector('.next');
+next_button.addEventListener('click', () => {
     startTimer();
-    if(answers.className === 'answers active'){
-    answers.className = 'answers'
-    questionNumber ++;
-    updateScore();
-
-    // if answered all questions...
-    if (questionNumber > data.length) {
-        game.endQuiz(correctAnswers, data.length);
-    } else {
-        // if questions still remain...
+    if (answers.classList.contains('active')) {
+        answers.classList.remove('active');
+        game.questionNumber++;
         game.handleShowNewQuestion();
-    }
     }
 });
 
@@ -80,24 +68,5 @@ document.addEventListener('click', (e) => {
         game = new Game();
         game.startGame();
         resetTimer();
-        questionNumber = 1;
-        correctAnswers = 0;
-        scoreBoard.innerHTML = `Your score: ${correctAnswers}/${questionNumber}`;
     }
-})
-
-// Score Variables
-let questionNumber;
-let correctAnswers;
-if (questionNumber !== 1 && correctAnswers !== 0) {
-    questionNumber = 1;
-    correctAnswers = 0;
-}
-const scoreBoard = document.querySelector('p');
-
-function updateScore(){
-    scoreBoard.innerHTML = `Your score: ${correctAnswers}/${questionNumber}`;
-}
-
-//Start score at question 1
-updateScore();
+});
